@@ -8,4 +8,5 @@ seaborn
 sklearn
 xgboost
 statsmodels
+pystan
 fbprophet
