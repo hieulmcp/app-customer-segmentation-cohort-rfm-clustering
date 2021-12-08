@@ -1,6 +1,8 @@
 streamlit
 pandas
 numpy
+NumPy
+Cython
 datetime
 matplotlib
 scipy
@@ -8,5 +10,6 @@ seaborn
 sklearn
 xgboost
 statsmodels
+wheel  #==0.24.0#
 pystan==2.19.1.1
 fbprophet==0.5
