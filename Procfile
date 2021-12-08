@@ -1,1 +1,1 @@
-web: sh setup.sh && streamlit run avocadoo_GUI.py
+web: sh setup.sh && streamlit run avocado_GUI.py
