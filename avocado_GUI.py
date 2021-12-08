@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import scipy
+# import scipy
 # %matplotlib inline
 import seaborn as sns
 
@@ -16,13 +16,13 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.svm import SVR
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import r2_score, mean_absolute_error, mean_squared_error, accuracy_score, classification_report, confusion_matrix
-from streamlit.stats import StatsHandler
+# from streamlit.stats import StatsHandler
 from xgboost import XGBRFRegressor
 
 # from math import sqrt
 from statsmodels.tsa.seasonal import seasonal_decompose
 from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from pmdarima import auto_arima
+# from pmdarima import auto_arima
 from fbprophet import Prophet
 from fbprophet.plot import add_changepoints_to_plot
 
@@ -190,10 +190,11 @@ elif choice == 'Price Prediction':
     lst_type = data['type'].unique().tolist()
     with st.form(key='Lựa chọn loại bơ và vùng muốn dự báo giá:'):
         # predic = st.radio('Lựa chọn dự báo giá hoặc sản lượng:', options=['AveragePrice','Total Volume'])
-        type_predic = st.multiselect('Lựa chọn loại bơ bạn muốn dự báo giá', lst_type)
-        region_predic = st.multiselect('Lựa chọn vùng bạn muốn dự báo giá', lst_region)
-        train_ratio = st.slider('Tỉ lệ tập train', 0.7, 0.9, 0.8)
-        values = st.slider('Lựa chọn khoảng chu kỳ', 0, 365, (45, 55))
+        type_predic = st.multiselect('Lựa chọn loại bơ bạn muốn dự báo giá:', lst_type, default=['organic'])
+        region_predic = st.multiselect('Lựa chọn vùng bạn muốn dự báo giá:', lst_region, default=['California'])
+        train_ratio = st.slider('Tỉ lệ tập train timeseri:', 0.7, 0.9, 0.8)
+        values = st.slider('Lựa chọn khoảng chu kỳ để tìm chu kỳ mùa vụ cho mô hình ExponentialSmoothing:', 0, 365, (45, 55))
+        select_predict = st.slider('Thời gian bạn muốn dự báo (năm):', 1, 5, 1)
         # end_date = st.date_input('End date', tomorrow)
         submit_button = st.form_submit_button(label='Submit')
     if submit_button:
@@ -244,9 +245,9 @@ elif choice == 'Price Prediction':
         model = ExponentialSmoothing(data_time, seasonal='mul', seasonal_periods=seasonal_final).fit()
         import datetime
         s = data_time.index.max() # cần tạo biến
-        e = data_time.index.max() + datetime.timedelta(days=365)
+        e = data_time.index.max() + datetime.timedelta(days=365*select_predict)
         pred_next_one_year = model.predict(start= s, end=e)
-        st.write('Dự báo cho 1 năm tới:')
+        st.write('Dự báo cho %.f năm tới:'%(select_predict))
         st.dataframe(pred_next_one_year)
         st.write('Biểu đồ so sánh và đánh giá:')
         x = pd.Series(pred_next_one_year)
@@ -263,11 +264,11 @@ elif choice == 'Price Prediction':
         model = Prophet(yearly_seasonality=True, daily_seasonality=False, weekly_seasonality=True)
         model.fit(data_time.reset_index().rename(columns={'Date':'ds','AveragePrice':'y'}))
         # 52 weeks
-        future = model.make_future_dataframe(periods = 52, freq='W')
+        future = model.make_future_dataframe(periods=52*select_predict, freq='W')
         forecast=model.predict(future)
-        st.write('Bảng kết quả dự báo:')
+        st.write('Bảng kết quả cho %.f năm tới:'%(select_predict))
         st.dataframe(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper', 'trend', 'trend_lower', 'trend_upper']])
-        st.write('Trực quan hóa khoảng tin cậy')
+        st.write('Trực quan hóa khoảng tin cậy FBProphet')
         plt.figure(figsize=(15,8))
         fig = model.plot(forecast)
         fig.show()
@@ -275,7 +276,7 @@ elif choice == 'Price Prediction':
         plt.plot(data_time, label='Average Price', color='green')
         plt.title('FaceBook Prophet')
         st.pyplot()
-        st.write('Xem xét yếu tố mùa vụ và tren của FBProphet đưa ra:')
+        st.write('Xem xét yếu tố mùa vụ và trend của FBProphet đưa ra:')
         fig1 = model.plot_components(forecast)
         st.pyplot(fig1)
 # Dự báo sản lượng
@@ -325,9 +326,9 @@ elif choice == 'Price Prediction':
         model = ExponentialSmoothing(data_time, seasonal='mul', seasonal_periods=seasonal_final).fit()
         import datetime
         s = data_time.index.max() # cần tạo biến
-        e = data_time.index.max() + datetime.timedelta(days=365)
+        e = data_time.index.max() + datetime.timedelta(days=365*select_predict)
         pred_next_one_year = model.predict(start= s, end=e)
-        st.write('Dự báo cho 1 năm tới:')
+        st.write('Dự báo cho %.f năm tới:'%(select_predict))
         st.dataframe(pred_next_one_year)
         st.write('Biểu đồ so sánh và đánh giá:')
         x = pd.Series(pred_next_one_year)
@@ -344,11 +345,11 @@ elif choice == 'Price Prediction':
         model = Prophet(yearly_seasonality=True, daily_seasonality=False, weekly_seasonality=True)
         model.fit(data_time.reset_index().rename(columns={'Date':'ds','Total Volume':'y'}))
         # 52 weeks
-        future = model.make_future_dataframe(periods = 52, freq='W')
+        future = model.make_future_dataframe(periods = 52*select_predict, freq='W')
         forecast=model.predict(future)
         st.write('Bảng kết quả dự báo:')
         st.dataframe(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper', 'trend', 'trend_lower', 'trend_upper']])
-        st.write('Trực quan hóa khoảng tin cậy')
+        st.write('Trực quan hóa khoảng tin cậy FBProphet')
         plt.figure(figsize=(15,8))
         fig = model.plot(forecast)
         fig.show()
