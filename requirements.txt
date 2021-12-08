@@ -8,5 +8,5 @@ seaborn
 sklearn
 xgboost
 statsmodels
-pystan==2.17.1.0
-fbprophet
+pystan==2.19.1.1
+fbprophet==0.5
