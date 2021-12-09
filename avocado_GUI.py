@@ -1,5 +1,5 @@
 import streamlit as st
-import numpy as np
+# import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 # import scipy
@@ -58,23 +58,40 @@ choice = st.sidebar.selectbox('Menu',menu)
 if choice == 'Business Objective':
     st.subheader('Business Objective')
     st.write("""
-    ###### Bơ “Hass”, một công ty có trụ sở tại Mexico, chuyên sản xuất nhiều loại quả bơ được bán ở Mỹ. Họ đã rất thành công trong những năm gần đây và muốn mở rộng. Vì vậy, họ muốn xây dựng mô hình hợp lý để dự đoán giá trung bình của bơ “Hass” ở Mỹ nhằm xem xét việc mở rộng các loại trang trại Bơ đang có cho việc trồng bơ ở các vùng khác.
-    ###### Hiện tại: Công ty kinh doanh quả bơ ở rất nhiều vùng của nước Mỹ với 2 loại bơ là bơ thường và bơ hữu cơ, được đóng gói theo nhiều quy chuẩn (Small/Large/XLarge Bags), và có 3 PLU (Product Look Up) khác nhau (4046, 4225, 4770). Nhưng họ chưa có mô hình để dự đoán giá bơ cho việc mở rộng.
+    - Bơ “Hass”, một công ty có trụ sở tại Mexico, chuyên sản xuất nhiều loại quả bơ được bán ở Mỹ. Họ đã rất thành công trong những năm gần đây và muốn mở rộng. Vì vậy, họ muốn xây dựng mô hình hợp lý để dự đoán giá trung bình của bơ “Hass” ở Mỹ nhằm xem xét việc mở rộng các loại trang trại Bơ đang có cho việc trồng bơ ở các vùng khác.
+    - Hiện tại: Công ty kinh doanh quả bơ ở rất nhiều vùng của nước Mỹ với 2 loại bơ là bơ thường và bơ hữu cơ, được đóng gói theo nhiều quy chuẩn (Small/Large/XLarge Bags), và có 3 PLU (Product Look Up) khác nhau (4046, 4225, 4770). Nhưng họ chưa có mô hình để dự đoán giá bơ cho việc mở rộng.
     """)
     st.write("""
-    ##### => Mục tiêu/ Vấn đề: Xây dựng mô hình dự đoán giá trung bình của bơ “Hass” ở Mỹ => xem xét việc mở rộng sản xuất, kinh doanh.
+    ###### => Mục tiêu/ Vấn đề: Xây dựng mô hình dự đoán giá trung bình của bơ “Hass” ở Mỹ.
+    ###### => Xem xét việc mở rộng sản xuất, kinh doanh.
     """)
     st.image('Avocado.jpeg')
     st.write("""
+    ##### Mùa bơ
+    Thời tiết nước Mỹ đa dạng với 4 mùa.
+    - Mùa xuân ấm áp kéo dài từ tháng 3 - tháng 6.
+    - Mùa hè ở Mỹ thì nắng nóng và bắt đầu từ tháng 6 – kết thúc đến tháng 9.
+    - Mùa thu mát mẻ, và từ tháng 9 – tháng 12
+    - Mùa đông tại Mỹ thì khá lạnh, và kéo dài từ tháng 12 – tháng 3
+    - Summer: June - August
+    - Fall: September - November
+    - Winter: December - February
+    - Spring: March - May 
+    """)
+    st.write("""
     #### Part 1: Data Understanding
+    - Xem xét tìm hiểu dữ liệu, phân tích các biến
+    - Trực quan hóa một vài thuộc tính của dữ liệu
     """)
     st.write("""
     #### Part 2: Build Project
+    - Thực hiện chạy các thuật toán Regression dự báo cho giá bơ
+    - Thực hiện các kiểm định MAE, MSE, R2
     """)
     st.write("""
     #### Part 3: Price Prediction
-    ###### ExponentialSmoothing - Time Series Algorithm
-    ###### Facebook Prophet - Time Series Algorithm
+    - ExponentialSmoothing - Time Series Algorithm
+    - Facebook Prophet - Time Series Algorithm
     """)
 elif choice == 'Data Understanding':
     numbers = [f for f in data.columns if data.dtypes[f]!='object']
@@ -105,6 +122,7 @@ elif choice == 'Data Understanding':
         sns.boxplot(data=data, y=data[i], x='type')
         plt.show()
     st.pyplot()
+    st.write('=> Qua biểu đồ cho thấy rằng giá bán các loại bơ ở các bang có phân phối tương đương phân phối chuẩn, giá bán bơ Organic cao hơn gấp rưỡi so với bơ Conventional, giá bán bơ Organic chứa nhiều outlier hơn so với bơ thường')
     st.write("""###### So sánh giá bơ Oganic và Conventional theo Region""")
     for i in ['AveragePrice']:
         plt.figure(figsize=(20,5))
@@ -112,6 +130,7 @@ elif choice == 'Data Understanding':
         plt.xticks(rotation=60, ha="right")
         plt.show()
     st.pyplot()
+    st.write('=> biểu đồ này cho thấy bơ thường có giá thấp hơn hẳn bơ Organic ở tất cả các bang')
     st.write("""###### Doanh thu bán hàng bơ Oganic và Conventional theo Region""")
     plt.figure(figsize=[20,5])
     df_ = data[data['region']!='TotalUS'].groupby(['region','type']).sum().reset_index()[['region','type','revenue']].sort_values('revenue',ascending=False)
@@ -127,6 +146,7 @@ elif choice == 'Data Understanding':
     plt.xticks(rotation=60, ha="right")
     plt.show()
     st.pyplot()
+    st.write('=> Doanh thu bơ thường cao hơn rất nhiều so với bơ Organic, chứng tỏ giá bán Organic cao mà sản lượng không nhiều')
 elif choice == 'Build Project':
     st.subheader('Build Project')
     with st.form(key='Lựa chọn tham số mô hình'):
@@ -170,14 +190,20 @@ elif choice == 'Build Project':
         st.write('Head of data after OneHotEncoder')
         st.dataframe(X_lb.head(5))
         st.write('Starting Regression...')
-        st.write('### Kết quả thuật toán LinearRegression')
-        SS_PF_LR(X_lb,y,train_ratio,RobustScaler(),PolynomialFeatures(degree=1),LinearRegression())
-        st.write('### Kết quả thuật toán RandomForestRegressor')
-        SS_PF_LR(X_lb,y,train_ratio,RobustScaler(),PolynomialFeatures(degree=1),RandomForestRegressor())
-        st.write('### Kết quả thuật toán DecisionTreeRegressor')
-        SS_PF_LR(X_lb,y,train_ratio,RobustScaler(),PolynomialFeatures(degree=1),DecisionTreeRegressor())
-        st.write('### Kết quả thuật toán XGBRFRegressor')
-        SS_PF_LR(X_lb,y,train_ratio,RobustScaler(),PolynomialFeatures(degree=1),XGBRFRegressor())
+        col1, col2 = st.columns([5,5])
+        with col1:
+            st.write('#### Kết quả thuật toán LinearRegression')
+            SS_PF_LR(X_lb,y,train_ratio,RobustScaler(),PolynomialFeatures(degree=1),LinearRegression())
+        with col2:
+            st.write('#### Kết quả thuật toán RandomForestRegressor')
+            SS_PF_LR(X_lb,y,train_ratio,RobustScaler(),PolynomialFeatures(degree=1),RandomForestRegressor())
+        col3, col4 = st.columns([5,5])
+        with col3:
+            st.write('#### Kết quả thuật toán DecisionTreeRegressor')
+            SS_PF_LR(X_lb,y,train_ratio,RobustScaler(),PolynomialFeatures(degree=1),DecisionTreeRegressor())
+        with col4:
+            st.write('#### Kết quả thuật toán XGBRFRegressor')
+            SS_PF_LR(X_lb,y,train_ratio,RobustScaler(),PolynomialFeatures(degree=1),XGBRFRegressor())
         st.write('Done!')
         st.write("""
         ### Nhận Xét:
