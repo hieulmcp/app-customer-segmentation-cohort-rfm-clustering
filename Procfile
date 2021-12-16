@@ -1,1 +1,0 @@
-web: sh setup.sh && streamlit run avocado_GUI.py
